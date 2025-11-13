@@ -1,14 +1,23 @@
 # Multi-Class Sentiment Analysis
 
-A comprehensive machine learning project for multi-class sentiment analysis using text data from Hugging Face datasets with multiple algorithm comparison, hyperparameter tuning, and model persistence for deployment.
+A comprehensive production-ready machine learning project for multi-class sentiment analysis using text data from Hugging Face datasets. Features modular architecture, multiple algorithm comparison, hyperparameter tuning, and interactive CLI for real-time predictions.
 
 ## 📋 Project Overview
 
-This project implements a sentiment analysis classifier that predicts sentiment (positive, negative, neutral) from text data. Through systematic experimentation with multiple algorithms and hyperparameter optimization, the project achieves **66.36% accuracy** on the test set using an optimized Logistic Regression model.
+This project implements an end-to-end sentiment analysis system that classifies text into three categories: positive, negative, and neutral. Through systematic experimentation with multiple algorithms and hyperparameter optimization, the project achieves **66.36% accuracy** on the test set using an optimized Logistic Regression model.
+
+**Key Highlights:**
+- Production-ready modular codebase with organized `src/` structure
+- Interactive CLI tool for real-time sentiment analysis
+- Comprehensive Jupyter notebook for experimentation and visualization
+- Automated training, evaluation, and prediction pipelines
+- Model persistence for easy deployment
 
 ## 🎯 Key Features
 
 - **Multi-class sentiment classification** (positive, negative, neutral)
+- **Modular architecture** with separation of concerns (data, features, models, pipelines)
+- **Interactive CLI** for real-time sentiment predictions with detailed analysis
 - **Advanced text preprocessing** with stopword removal and tokenization
 - **Comprehensive feature engineering**:
   - Bag of Words (BOW) representation using CountVectorizer
@@ -18,9 +27,10 @@ This project implements a sentiment analysis classifier that predicts sentiment 
 - **Complete dataset utilization** (train/validation/test split from Hugging Face)
 - **Multiple algorithm comparison and evaluation**
 - **Hyperparameter tuning** using GridSearchCV
-- **Model persistence** with pickle for deployment
-- **Prediction pipeline** for new text samples
+- **Model persistence** with joblib for deployment
+- **Automated pipelines** for training, inference, and evaluation
 - **Data visualization and exploratory data analysis**
+- **Unit tests** for code reliability
 
 ## 📊 Dataset
 
@@ -51,6 +61,7 @@ The project uses the [multiclass-sentiment-analysis-dataset](https://huggingface
   - `ipykernel` (>=6.0.0) - Jupyter kernel
   - `tqdm` (>=4.60.0) - Progress bars
   - `requests` (>=2.25.0) - HTTP library
+  - `joblib` - Model serialization
 
 ## 🚀 Getting Started
 
@@ -58,7 +69,7 @@ The project uses the [multiclass-sentiment-analysis-dataset](https://huggingface
 
 1. **Python 3.7 or higher**
 2. **Hugging Face account and token** (Get yours at [huggingface.co](https://huggingface.co/settings/tokens))
-3. **Jupyter Notebook or VS Code with Python extension**
+3. **Git** for cloning the repository
 
 ### Installation
 
@@ -75,9 +86,7 @@ The project uses the [multiclass-sentiment-analysis-dataset](https://huggingface
 
 3. Download NLTK data:
    ```python
-   import nltk
-   nltk.download('stopwords')
-   nltk.download('punkt')
+   python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt')"
    ```
 
 ### Setup
@@ -91,16 +100,51 @@ The project uses the [multiclass-sentiment-analysis-dataset](https://huggingface
 
 ## 📝 Usage
 
-### Training the Model
+### Method 1: Using Python Scripts (Recommended for Production)
 
-1. Open the Jupyter notebook:
+#### Train the Model
+```bash
+python train.py
+```
+This will:
+- Load and preprocess data from Hugging Face
+- Engineer features and create BOW representations
+- Train the optimized Logistic Regression model
+- Save the trained model and vectorizer
+
+#### Make Predictions
+```bash
+python predict.py
+```
+Run predictions on sample texts to test the model.
+
+#### Evaluate the Model
+```bash
+python evaluate.py
+```
+Run comprehensive evaluation on the test set with detailed metrics.
+
+#### Interactive CLI (Real-time Analysis)
+```bash
+python interactive_predict.py
+```
+Launch an interactive command-line interface for real-time sentiment analysis:
+- Enter any text to get instant sentiment predictions
+- View confidence scores and probability distributions
+- See text features and detailed analysis
+- Commands: `help`, `examples`, `quit`
+
+**Interactive CLI Features:**
+- 😊 Emoji-based sentiment indicators
+- 📊 Visual probability bars
+- 📈 Text feature statistics
+- 🔍 Side-by-side original and cleaned text comparison
+
+### Method 2: Using Jupyter Notebook (Recommended for Experimentation)
+
+1. Launch Jupyter:
    ```bash
    jupyter notebook Sentimental_Analysis_.ipynb
-   ```
-   
-   Or open in VS Code:
-   ```bash
-   code Sentimental_Analysis_.ipynb
    ```
 
 2. Run all cells in sequence to:
@@ -112,41 +156,73 @@ The project uses the [multiclass-sentiment-analysis-dataset](https://huggingface
    - Evaluate on the test set
    - Save the best model
 
-### Making Predictions with Saved Model
+### Method 3: Programmatic API
 
 ```python
-import pickle
-import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
+from src.pipelines.inference_pipeline import InferencePipeline
 
-# Load the saved model
-with open('best_sentiment_model.pkl', 'rb') as f:
-    model = pickle.load(f)
+# Initialize pipeline
+pipeline = InferencePipeline()
 
-# Load the vectorizer
-with open('vectorizer.pkl', 'rb') as f:
-    vectorizer = pickle.load(f)
+# Single prediction
+text = "I love this product! It's amazing!"
+result = pipeline.predict_with_details(text)[0]
 
-# Prepare new text for prediction
-new_text = ["I love this product, it's amazing!"]
-new_text_vectorized = vectorizer.transform(new_text)
+print(f"Sentiment: {result['predicted_sentiment']}")
+print(f"Confidence: {result['confidence']:.2%}")
+print(f"Probabilities: {result['probabilities']}")
 
-# Make prediction
-prediction = model.predict(new_text_vectorized)
-# 0 = negative, 1 = neutral, 2 = positive
+# Batch predictions
+texts = [
+    "Excellent service!",
+    "Terrible experience.",
+    "It was okay."
+]
+results = pipeline.predict_and_display(texts)
 ```
 
 ## 🏗️ Project Structure
 
 ```
 Multi-Class-Sentimental-Analysis-/
-├── Sentimental_Analysis_.ipynb    # Main notebook with complete analysis
-├── requirements.txt               # Python dependencies
-├── best_sentiment_model.pkl       # Saved trained model (generated after training)
-├── vectorizer.pkl                 # Saved CountVectorizer (generated after training)
-├── .gitignore                     # Git ignore file
-├── README.md                      # Project documentation
-└── .env                          # Environment variables (create this - not in repo)
+├── src/                           # Source code package
+│   ├── __init__.py               # Package initializer
+│   ├── config/                   # Configuration files
+│   │   ├── __init__.py
+│   │   └── config.py            # Model and data configurations
+│   ├── data/                     # Data loading and processing
+│   │   ├── __init__.py
+│   │   └── data_loader.py       # HuggingFace dataset loader
+│   ├── features/                 # Feature engineering
+│   │   ├── __init__.py
+│   │   ├── preprocessing.py     # Text preprocessing (stopwords, tokenization)
+│   │   └── feature_engineering.py  # BOW, text features
+│   ├── models/                   # Model definitions
+│   │   ├── __init__.py
+│   │   └── train.py             # SentimentModel class with train/predict
+│   ├── pipelines/                # End-to-end pipelines
+│   │   ├── __init__.py
+│   │   ├── training_pipeline.py    # Complete training workflow
+│   │   ├── inference_pipeline.py   # Prediction workflow
+│   │   └── evaluation_pipeline.py  # Model evaluation workflow
+│   └── utils/                    # Utility functions
+│       ├── __init__.py
+│       └── helpers.py           # Common helper functions
+├── notebooks/                    # Jupyter notebooks
+│   └── (exploration notebooks)
+├── tests/                        # Unit tests
+│   └── (test files)
+├── train.py                      # Main training script
+├── predict.py                    # Batch prediction script
+├── evaluate.py                   # Model evaluation script
+├── interactive_predict.py        # Interactive CLI tool
+├── Sentimental_Analysis_.ipynb   # Main analysis notebook
+├── requirements.txt              # Python dependencies
+├── .gitignore                    # Git ignore file
+├── .env                          # Environment variables (not in repo)
+├── README.md                     # This file
+├── best_sentiment_model.pkl      # Saved model (generated after training)
+└── vectorizer.pkl                # Saved vectorizer (generated after training)
 ```
 
 ## 🧠 Implementation Details
@@ -295,19 +371,16 @@ print(f"Final Test Accuracy: {final_accuracy:.4f}")
 
 #### **Step 9: Model Persistence**
 ```python
-import pickle
+import joblib
 
 # Save the trained model
-with open('best_sentiment_model.pkl', 'wb') as f:
-    pickle.dump(best_model, f)
+joblib.dump(best_model, 'best_sentiment_model.pkl')
 
 # Save the vectorizer
-with open('vectorizer.pkl', 'wb') as f:
-    pickle.dump(vectorizer, f)
+joblib.dump(vectorizer, 'vectorizer.pkl')
 
 # Load model for predictions
-with open('best_sentiment_model.pkl', 'rb') as f:
-    loaded_model = pickle.load(f)
+loaded_model = joblib.load('best_sentiment_model.pkl')
 
 # Make predictions on new data
 new_predictions = loaded_model.predict(new_data_vectorized)
@@ -387,6 +460,7 @@ The notebook includes comprehensive visualizations:
 
 This project demonstrates:
 - **Multi-class classification techniques** in NLP
+- **Modular software architecture** for ML projects
 - **Feature engineering strategies** to boost model performance (+11.96%)
 - **Algorithm comparison methodology** for model selection
 - **Hyperparameter optimization** using GridSearchCV
@@ -394,6 +468,7 @@ This project demonstrates:
 - **Complete ML pipeline** from data loading to prediction
 - **Best practices** in train/test splits and evaluation
 - **Real-world NLP preprocessing** with NLTK
+- **Interactive CLI development** for user-friendly predictions
 
 ## 🚀 Future Improvements
 
@@ -428,58 +503,45 @@ Potential enhancements to consider:
   - Docker containerization
   - Cloud deployment (AWS, GCP, Azure)
 
-## 💡 Model Deployment Example
+## 💡 API Examples
 
+### Using the Training Pipeline
 ```python
-# Complete prediction pipeline
-import pickle
-import pandas as pd
-from nltk.corpus import stopwords
-from nltk.tokenize import WordPunctTokenizer
+from src.pipelines.training_pipeline import TrainingPipeline
 
-# Load saved artifacts
-with open('best_sentiment_model.pkl', 'rb') as f:
-    model = pickle.load(f)
-with open('vectorizer.pkl', 'rb') as f:
-    vectorizer = pickle.load(f)
+# Train the model
+pipeline = TrainingPipeline()
+results = pipeline.run()
+print(f"Training accuracy: {results['accuracy']:.4f}")
+```
 
-# Preprocessing function
-def preprocess_text(text):
-    stop_words = set(stopwords.words('english'))
-    tokenizer = WordPunctTokenizer()
-    tokens = tokenizer.tokenize(text.lower())
-    filtered = [word for word in tokens if word.isalnum() and word not in stop_words]
-    return ' '.join(filtered)
+### Using the Inference Pipeline
+```python
+from src.pipelines.inference_pipeline import InferencePipeline
 
-# Feature engineering function
-def extract_features(text):
-    processed = preprocess_text(text)
-    bow = vectorizer.transform([processed])
-    
-    # Add numeric features
-    text_length = len(text)
-    word_count = len(text.split())
-    symbol_count = sum(not c.isalnum() and not c.isspace() for c in text)
-    
-    # Combine features
-    from scipy.sparse import hstack
-    numeric = [[text_length, word_count, symbol_count]]
-    return hstack([bow, numeric])
+# Make predictions
+pipeline = InferencePipeline()
+text = "This is an amazing product!"
+result = pipeline.predict_with_details(text)[0]
 
-# Prediction function
-def predict_sentiment(text):
-    features = extract_features(text)
-    prediction = model.predict(features)[0]
-    sentiment_map = {0: 'negative', 1: 'neutral', 2: 'positive'}
-    return sentiment_map[prediction]
+print(f"Sentiment: {result['predicted_sentiment']}")
+print(f"Confidence: {result['confidence']:.2%}")
+print(f"Probabilities: {result['probabilities']}")
+```
 
-# Usage
-text = "I absolutely love this product! It's amazing!"
-result = predict_sentiment(text)
-print(f"Sentiment: {result}")  # Output: positive
+### Using the Evaluation Pipeline
+```python
+from src.pipelines.evaluation_pipeline import EvaluationPipeline
+
+# Evaluate model
+pipeline = EvaluationPipeline()
+results = pipeline.run_comprehensive_evaluation()
+print(f"Test accuracy: {results['accuracy']:.4f}")
 ```
 
 ## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
@@ -536,7 +598,7 @@ Feel free to open an issue on GitHub for any questions or bug reports!
 
 ## 🔒 Security Note
 
-**Important**: Make sure to keep your Hugging Face token secure and never commit it to version control. The `.env` file is included in `.gitignore` for your security. Never share your token publicly!
+**Important**: Keep your Hugging Face token secure and never commit it to version control. The `.env` file is included in `.gitignore` for your security. Never share your token publicly.
 
 ---
 
@@ -558,8 +620,11 @@ python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt')"
 # Create .env file and add your Hugging Face token
 echo "secret_token_hugface=your_token_here" > .env
 
-# Launch Jupyter Notebook
-jupyter notebook Sentimental_Analysis_.ipynb
+# Train the model
+python train.py
+
+# Try the interactive CLI
+python interactive_predict.py
 ```
 
 **Happy Analyzing!** 🎉📊🚀
